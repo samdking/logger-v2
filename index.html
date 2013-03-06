@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+	<head>
+		<style>
+			body { font-size: 14px; font-family: helvetica; line-height: 20px; padding: 20px 10px; margin: auto }
+			strong { display: block;}
+			.block { float: left; width: 50%; padding: 0 10px 20px; box-sizing: border-box; }
+			.filters { background: #eee; overflow: hidden; padding: 5px; font-size: 12px;}
+			.filters .query { float: left; padding: 4px;}
+			.filters fieldset { border: 0; float: right;}
+			.tickets ul { padding: 0; float: left; clear: both; width: 100%;}
+			.tickets>ul>li { font-size: 12px; list-style: none; float: left; clear: left; padding: 5px 0; border-bottom: 1px solid #CCC; width: 100%;}
+			.tickets li:last-child { border: 0}
+			.tickets .selected { background: lightyellow; }
+			.tickets strong { font-size: 14px;}
+			.tickets strong.today { color: green;}
+			.tickets .time-today {  }
+			.tickets .days-ago { padding-right: 3px; font-size: 11px; text-transform: uppercase; color: #888;}
+			.tickets .show-more { clear: both; cursor: pointer; padding: 1px; background: #DDD; display: block; text-align: center; font-size: 12px; }
+			.tickets .people { margin: -3px; float: right; max-width: 50%;}
+			.tickets .people li { list-style: none; padding: 0; float: right; border: 0; }
+			.tickets .people .person { background: lightgreen; width: 20px; line-height: 20px; display: block; margin: 3px; font-size: 11px; text-align: center;}
+			.tickets .people .person.me { outline: 1px solid green;}
+			.ticket { padding: 0 10px;}
+			.ticket .detail { background: #DDD; padding: 15px; box-sizing: border-box; height: 100%;}
+			.ticket .tasks { font-size: 12px; margin-top: 10px; border-spacing: 0; line-height: 16px;}
+			.ticket .tasks td { vertical-align: top; padding: 4px 0; border-bottom: 1px solid #888;}
+			.ticket .tasks tr:last-child td { border-bottom: 0; }
+			.ticket .tasks td:last-child { width: 40px; text-align: right; padding-left: 5px;}
+		</style>
+	</head>
+	<body>
+
+		<div class="tickets block">
+			<div class="filters">
+				<input class="query" data-bind="value: query, valueUpdate: 'keyup'">
+				<fieldset data-bind="foreach: departments">
+					<label>
+						<input type="checkbox" data-bind="value: uid, checked: selected" />
+						<span data-bind="text: name"></span>
+					</label>
+				</fieldset>
+			</div>
+			<!--<div data-bind="text: ticketCount"></div>-->
+			<ul data-bind="visible: filteredTickets, foreach: filteredTickets">
+				<li data-bind="click: $parent.viewTicket, css: {selected: $data == $root.selectedTicket()}">
+					<ul class="people" data-bind="foreach: people()">
+						<li><span class="person" data-bind="css: {me: $data == $root.initials}, text: $data"></span></li>
+					</ul>
+					<strong data-bind="css: {today: loggedToday()}">
+						<span data-bind="text: summary"></span>
+						<span data-bind="visible: loggedToday(), text: taskCount" class="task-count"></span>
+						<span data-bind="" class="time-today"></span>
+					</strong>
+					<span class="days-ago" data-bind="visible: timeAgo(), text: timeAgo()"></span>
+					<span style="color: blue" data-bind="text: client"></span> 
+				</li>
+			</ul>
+			<a class="show-more" data-bind="visible: filteredTickets().length < ticketCount(), click: showMore">More</a>
+		</div>
+
+		<div class="ticket block">
+			<div class="detail" data-bind="if: selectedTicket">
+				<strong data-bind="text: selectedTicket().summary"></strong>
+				<div data-bind="html: selectedTicket().description"></div>
+				<table class="tasks">
+					<tbody>
+					<!-- ko foreach: selectedTicket().tasks -->
+						<tr>
+							<td><span data-bind="text: $data.description"></span></td>
+							<td><span data-bind="text: $data.duration"></span></td>
+						</tr>
+					<!-- /ko -->
+					</tbody>
+				</table>
+				<p data-bind="visible: !selectedTicket().tasks().length">No tasks logged today</p>
+			</div>
+		</div>
+
+		<script src="ko.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>
