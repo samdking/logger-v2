@@ -2,13 +2,6 @@
 var LoggerViewModel = function(data) {
 	var self = this;
 	this.initials = 'SK';
-	this.setupDefaultDepartments = function(depts) {
-		var arr = depts.map(function(item) {
-			var key = item.name;
-			return { key: true};
-		});
-		localStorage.setItem('filterDepartments', JSON.stringify(arr));
-	};
 	this.query = ko.observable('');
 	this.tickets = ko.observableArray([]);
 	this.perPage = ko.observable(15);
