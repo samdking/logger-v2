@@ -1,0 +1,25 @@
+body { font-size: 14px; font-family: helvetica; line-height: 20px; padding: 20px 10px; margin: auto }
+strong { display: block;}
+.block { float: left; width: 50%; padding: 0 10px 20px; box-sizing: border-box; }
+.filters { background: #eee; overflow: hidden; padding: 5px; font-size: 12px;}
+.filters .query { float: left; padding: 4px;}
+.filters fieldset { border: 0; float: right;}
+.tickets ul { padding: 0; float: left; clear: both; width: 100%;}
+.tickets>ul>li { font-size: 12px; list-style: none; float: left; clear: left; padding: 5px 0; border-bottom: 1px solid #CCC; width: 100%;}
+.tickets li:last-child { border: 0}
+.tickets .selected { background: lightyellow; }
+.tickets strong { font-size: 14px;}
+.tickets strong.today { color: green;}
+.tickets .time-today {  }
+.tickets .days-ago { padding-right: 3px; font-size: 11px; text-transform: uppercase; color: #888;}
+.tickets .show-more { clear: both; cursor: pointer; padding: 1px; background: #DDD; display: block; text-align: center; font-size: 12px; }
+.tickets .people { margin: -3px; float: right; max-width: 50%;}
+.tickets .people li { list-style: none; padding: 0; float: right; border: 0; }
+.tickets .people .person { background: lightgreen; width: 20px; line-height: 20px; display: block; margin: 3px; font-size: 11px; text-align: center;}
+.tickets .people .person.me { outline: 1px solid green;}
+.ticket { padding: 0 10px;}
+.ticket .detail { background: #DDD; padding: 15px; box-sizing: border-box; height: 100%;}
+.ticket .tasks { font-size: 12px; margin-top: 10px; border-spacing: 0; line-height: 16px;}
+.ticket .tasks td { vertical-align: top; padding: 4px 0; border-bottom: 1px solid #888;}
+.ticket .tasks tr:last-child td { border-bottom: 0; }
+.ticket .tasks td:last-child { width: 40px; text-align: right; padding-left: 5px;}
