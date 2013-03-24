@@ -1,14 +1,32 @@
 
+function shortDateFormat(date) {
+	var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+	return date.getDate() + ' ' + monthNames[date.getMonth()];
+}
+
 var LoggerViewModel = function(data) {
 	var self = this;
-	this.initials = 'SK';
+	this.info = ko.observable([
+		'Last Updated: ' + data.last_updated,
+		'Size: ' + data.file_size,
+		'Load time: ' + data.response_time
+	].join(' <span>|</span> '));
+	this.user = ko.observable({
+		initials: 'SK',
+		id: 39,
+		firstName: 'Sam',
+		lastName: 'King'
+	});
 	this.query = ko.observable('');
 	this.tickets = ko.observableArray([]);
 	this.perPage = ko.observable(15);
 	this.selectedTicket = ko.observable();
 	data.tickets.map(function(data) {
-		self.tickets.push(new Ticket(data));
-	});
+		var ticket = new Ticket(data);
+		self.tickets.push(ticket);
+		if (data.uid == localStorage.openedTicket)
+			this.selectedTicket(ticket);
+	}, this);
 	var storedDepts = JSON.parse(localStorage.getItem('filterDepartments'));
 
 	this.departments = [
@@ -37,7 +55,7 @@ var LoggerViewModel = function(data) {
 		var perPage = self.perPage();
 		var all = ko.utils.arrayFilter(self.tickets(), function(item) {
 			return ko.utils.arrayFirst(self.filterDepartments(), function(dept) {
-				return item.department_uid == dept.uid && item.summary.toLowerCase().indexOf(self.query().toLowerCase()) > -1;
+				return item.department_uid == dept.uid && item.summary && item.summary.toLowerCase().indexOf(self.query().toLowerCase()) > -1;
 			});
 		});
 		self.ticketCount(all.length);
@@ -50,28 +68,74 @@ var LoggerViewModel = function(data) {
 	};
 
 	this.viewTicket = function(item) {
+		if (self.selectedTicket() === item)
+			item = null;
 		self.selectedTicket(item);
+		localStorage.openedTicket = item? item.uid : null;
 	};
+
+	this.scheduledTasks = ko.computed(function() {
+		return ko.utils.arrayFilter(self.tickets(), function(item) {
+			return item.loggedToday();
+		});
+	});
 };
 
 var Ticket = function(data) {
+
+	this.taskTypes = ko.observableArray(['Meeting']);
+	this.timing = ko.observable(false);
 	for(var i in data)
 		this[i] = data[i];
-	this.timeAgo = function() {
-		if (!this.last_time_i_logged)
-			return null;
-		var dateLogged = new Date(this.last_time_i_logged);
-		var days = Math.round((new Date() - dateLogged)/1000/60/60/24);
-		return days + ' day' + (days === 1? '' : 's');
-	};
-	this.tasks = ko.observableArray(data.tasks || []);
+	this.tasks = ko.observableArray(data.tasks? data.tasks.map(function(task) {
+		return new Task(task);
+	}) : []);
 	this.taskCount = ko.computed(function() {
 		return '(' + this.tasks().length + ')';
 	}, this);
-	this.people = function() {
-		return data.people.split(', ');
+	this.last_time_i_logged = ko.observable(data.last_time_i_logged);
+	this.timeAgo = function() {
+		if (!this.last_time_i_logged)
+			return null;
+		var dateLogged = new Date(this.last_time_i_logged());
+		var days = Math.round((new Date() - dateLogged)/1000/60/60/24);
+		return days + ' day' + (days === 1? '' : 's');
 	};
-	this.loggedToday = ko.observable(parseInt(this.timeAgo(), 10) <= 1);
+	var self = this;
+	this.loggedToday = ko.computed(function() {
+		return parseInt(self.timeAgo(), 10) <= 3;
+	});
+	this.newTask = ko.observable();
+	this.saveTask = function(data) {
+		self.newTask().save(data);
+		self.tasks.unshift(self.newTask());
+		self.last_time_i_logged(self.newTask().datetime);
+		self.newTask(null);
+	};
+	this.createTask = function() {
+		this.newTask(new Task({datetime: new Date()}));
+	};
+	this.cancel = function() {
+		self.newTask(null);
+	};
+	this.people = function() {
+		return data.people? data.people.split(', ') : [];
+	};
+};
+
+var Task = function(data)
+{
+	for(var i in data)
+		this[i] = data[i];
+	this.datetime = new Date(data.datetime);
+	this.description = ko.observable(data.description);
+	this.duration = ko.observable(data.duration || 0);
+	this.save = function(data) {
+		console.log('Writing ' + this.description());
+	};
+	this.date = function() {
+		return shortDateFormat(this.datetime);
+	};
 };
 
 var Department = function(data)
@@ -82,6 +146,10 @@ var Department = function(data)
 	this.selected = ko.observable(data.selected);
 };
 
-$.getJSON('json.php', function(response) {
+var startTime = new Date();
+
+$.getJSON('json.php', function(response, status, jqXHR) {
+	response.response_time = (new Date() - startTime) / 1000 + 's';
+	response.file_size = Math.round(jqXHR.responseText.length/1024) + 'k';
 	ko.applyBindings(new LoggerViewModel(response));
 });

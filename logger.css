@@ -19,7 +19,16 @@ strong { display: block;}
 .tickets .people .person.me { outline: 1px solid green;}
 .ticket { padding: 0 10px;}
 .ticket .detail { background: #DDD; padding: 15px; box-sizing: border-box; height: 100%;}
-.ticket .tasks { font-size: 12px; margin-top: 10px; border-spacing: 0; line-height: 16px;}
+.ticket .tasks { width: 100%; font-size: 12px; margin-top: 10px; border-spacing: 0; line-height: 16px;}
 .ticket .tasks td { vertical-align: top; padding: 4px 0; border-bottom: 1px solid #888;}
 .ticket .tasks tr:last-child td { border-bottom: 0; }
 .ticket .tasks td:last-child { width: 40px; text-align: right; padding-left: 5px;}
+.ticket .tasks td.date { width: 50px;}
+.info { clear: both; padding: 7px 10px; margin: 10px -10px -20px; text-align: right; background: #555; color: #EEE; font-size: 11px; }
+.info span { padding: 0 4px; color: #AAA;}
+.ticket .timer { background: #AAA; border-bottom: 1px solid #888; padding: 15px;}
+.ticket .btn { float: right;}
+.ticket .timer textarea { font-size: 13px; line-height: 16px; height: 68px; margin: 0; width: 80%; box-sizing: border-box; border: 0; background: #DDD; padding: 10px; }
+.ticket .timer .time { float: right; width: 20%; text-align: right;}
+.ticket .timer .time input { font-size: 20px; font-family: monospace; width: 30px; margin: 0 0 0 5px;}
+.ticket .timer .time select {  margin-top: 10px; margin-left: 10px;}

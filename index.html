@@ -19,11 +19,11 @@
 			<ul data-bind="visible: filteredTickets, foreach: filteredTickets">
 				<li data-bind="click: $parent.viewTicket, css: {selected: $data == $root.selectedTicket()}">
 					<ul class="people" data-bind="foreach: people()">
-						<li><span class="person" data-bind="css: {me: $data == $root.initials}, text: $data"></span></li>
+						<li><span class="person" data-bind="css: {me: $data == $root.user().initials}, text: $data"></span></li>
 					</ul>
 					<strong data-bind="css: {today: loggedToday()}">
 						<span data-bind="text: summary"></span>
-						<span data-bind="visible: loggedToday(), text: taskCount" class="task-count"></span>
+						<span data-bind="visible: taskCount, text: taskCount" class="task-count"></span>
 						<span data-bind="" class="time-today"></span>
 					</strong>
 					<span class="days-ago" data-bind="visible: timeAgo(), text: timeAgo()"></span>
@@ -34,22 +34,43 @@
 		</div>
 
 		<div class="ticket block">
-			<div class="detail" data-bind="if: selectedTicket">
-				<strong data-bind="text: selectedTicket().summary"></strong>
-				<div data-bind="html: selectedTicket().description"></div>
+			<!-- ko if: selectedTicket -->
+			<div class="timer" data-bind="if: selectedTicket().newTask(), visible: selectedTicket().newTask()">
+				<form data-bind="submit: selectedTicket().saveTask, with: selectedTicket()">
+					<div class="time">
+						<input>	: <input>
+						<select data-bind="options: taskTypes"></select>
+					</div>
+					<textarea name="description" data-bind="hasfocus: newTask(), value: newTask().description"></textarea>
+					<input type="submit" value="Save">
+					<input type="button" value="Cancel" data-bind="click: cancel">
+				</form>
+			</div>
+			<div class="detail" data-bind="with: selectedTicket">
+				<button data-bind="click: createTask, enable: !newTask()" class="new-task btn">New Task</button>
+				<strong data-bind="text: summary"></strong>
+				<div data-bind="html: description"></div>
 				<table class="tasks">
 					<tbody>
-					<!-- ko foreach: selectedTicket().tasks -->
+					<!-- ko foreach: tasks -->
 						<tr>
-							<td><span data-bind="text: $data.description"></span></td>
-							<td><span data-bind="text: $data.duration"></span></td>
+							<td class="date"><span data-bind="text: date()"></span></td>
+							<td class="description"><span data-bind="text: description"></span></td>
+							<td class="duration"><span data-bind="text: duration"></span></td>
 						</tr>
 					<!-- /ko -->
 					</tbody>
 				</table>
-				<p data-bind="visible: !selectedTicket().tasks().length">No tasks logged today</p>
+				<p data-bind="visible: !tasks().length">No tasks logged</p>
+			</div>
+			<!-- /ko -->
+			<div class="detail" data-bind="if: !selectedTicket()">
+				<h1>Welcome back, <span data-bind="text: user().firstName"></span></h1>
+				<p>You have <span data-bind="text: scheduledTasks().length"></span> scheduled tasks today.</p>
 			</div>
 		</div>
+
+		<div class="info" data-bind="html: info"></div>
 
 		<script src="ko.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
